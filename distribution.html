@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<style>
+    body {
+      background-color: #f7f3ee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 180vh;
+      margin: 0;
+    }
+
+    .distribution-frame {
+      border: 2px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: #fff;
+      width: auto;
+      height: auto;
+    }
+
+    .distribution-container {
+      text-align: center;
+    }
+
+    #my_dataviz {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .section {
+      top: 5%;
+      position: absolute;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+</style>
+
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+
+
+<div class="section">
+  <h2>MBTI Distribution Map</h2>
+  <p>You can click the MBTI types on the bottom to see the distribution.</p>
+</div>
+
+
+<select id="dropdown">
+  <option value="ISTP" ${initialSelection === 'ISTP' ? 'selected' : ''}>ISTP</option>
+  <option value="INTJ" ${initialSelection === 'INTJ' ? 'selected' : ''}>INTJ</option>
+  <option value="ENTP" ${initialSelection === 'ENTP' ? 'selected' : ''}>ENTP</option>
+  <option value="ESFP" ${initialSelection === 'ESFP' ? 'selected' : ''}>ESFP</option>
+  <option value="ENTJ" ${initialSelection === 'ENTJ' ? 'selected' : ''}>ENTJ</option>
+  <option value="ISFP" ${initialSelection === 'ISFP' ? 'selected' : ''}>ISFP</option>
+  <option value="INFJ" ${initialSelection === 'INFJ' ? 'selected' : ''}>INFJ</option>
+  <option value="INTP" ${initialSelection === 'INTP' ? 'selected' : ''}>INTP</option>
+  <option value="ISTJ" ${initialSelection === 'ISTJ' ? 'selected' : ''}>ISTJ</option>
+  <option value="ESTP" ${initialSelection === 'ESTP' ? 'selected' : ''}>ESTP</option>
+  <option value="ENFJ" ${initialSelection === 'ENFJ' ? 'selected' : ''}>ENFJ</option>
+  <option value="ISFJ" ${initialSelection === 'ISFJ' ? 'selected' : ''}>ISFJ</option>
+  <option value="ENFP" ${initialSelection === 'ENFP' ? 'selected' : ''}>ENFP</option>
+  <option value="INFP" ${initialSelection === 'INFP' ? 'selected' : ''}>INFP</option>
+  <option value="ESFJ" ${initialSelection === 'ESFJ' ? 'selected' : ''}>ESFJ</option>
+  <option value="ESTJ" ${initialSelection === 'ESTJ' ? 'selected' : ''}>ESTJ</option>
+</select>
+
+  <svg id="my_dataviz" width="2000" height="800"></svg>
+
+
+<script>
+  const dropdown = document.getElementById('dropdown');
+  // Define the initialSelection variable
+  var initialSelection = "ISTP";
+
+  // Set the initial selection
+  dropdown.value = initialSelection;
+  handleDropdownChange();
+
+  dropdown.addEventListener('change', handleDropdownChange);
+
+  // The svg
+  const svg = d3.select('svg'),
+    width = +svg.attr('width'),
+    height = +svg.attr('height');
+
+  // Map and projection
+  const path = d3.geoPath();
+  const projection = d3
+    .geoMercator()
+    .scale(110)
+    .center([0, 20])
+    .translate([width / 2, height / 2]);
+
+  // Data and color scale
+  const data = new Map();
+  const colorScale = d3
+    .scaleThreshold()
+    .domain([0, 0.03, 0.06, 0.09, 0.12])
+    .range(d3.schemeBlues[5]);
+
+  var Tooltip = d3
+      .select('body')
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 1)
+      .style('background-color', 'white')
+      .style('border', 'solid')
+      .style('border-width', '2px')
+      .style('border-radius', '5px')
+      .style('padding', '5px');
+
+  function handleDropdownChange() {
+    const selectedOption = dropdown.value;
+    // Load external data and boot
+    Promise.all([
+      d3.json(
+        'https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson'
+      ),
+      d3.csv('countries.csv', function (d) {
+        data.set(d.code, +d[selectedOption]);
+      }),
+    ]).then(function (loadData) {
+      let topo = loadData[0];
+
+
+      var mouseOver = function (d) {
+        Tooltip.style('opacity', 1);
+        d3.selectAll('.Country')
+          .transition()
+          .duration(200)
+          .style('opacity', 0.5);
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style('opacity', 1)
+          .style('stroke', 'black');
+      };
+
+      var mouseLeave = function (d) {
+        Tooltip.style('opacity', 0);
+        d3.selectAll('.Country')
+          .transition()
+          .duration(200)
+          .style('opacity', 0.8);
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .style('stroke', 'transparent');
+      };
+
+      var mousemove = function (event, d) {
+        Tooltip.html(
+          'Country Code: ' + d.id + '<br>' +
+          'Percentage: ' + Math.round(d.total * 100 * 100) / 100 + '%'
+        )
+          .style('left', event.x / 2 + 'px')
+          .style('top', event.y / 2 - 30 + 'px');
+      };
+
+      // Draw the map
+      svg
+        .append('g')
+        .selectAll('path')
+        .data(topo.features)
+        .enter()
+        .append('path')
+        // draw each country
+        .attr('d', d3.geoPath().projection(projection))
+        // set the color of each country
+        .attr('fill', function (d) {
+          d.total = data.get(d.id) || 0;
+          return colorScale(d.total);
+        })
+        .style('stroke', 'transparent')
+        .attr('class', function (d) {
+          return 'Country';
+        })
+        .style('opacity', 0.8)
+        .on('mouseover', mouseOver)
+        .on('mousemove', mousemove)
+        .on('mouseleave', mouseLeave);
+    });
+  }
+</script>

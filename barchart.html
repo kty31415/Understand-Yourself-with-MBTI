@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Radial Stacked Bar Chart</title>
+    <style>
+      .tooltip {
+        position: absolute;
+        text-align: center;
+        width: 60px;
+        height: 28px;
+        padding: 2px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+        pointer-events: none;
+      }
+      body {
+      background-color: #f7f3ee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 110vh;
+      margin: 0;
+    }
+
+      .section {
+      top: 5%;
+      position: absolute;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+    </style>
+  </head>
+  <body>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+    <div class="section">
+      <h2>Radial Stacked Bar Chart</h2>
+      <p>The top 10 most frequent words used by different personality.</p>
+    </div>
+
+    <script>
+      // Variables
+      const data = [
+        {
+          name: 'INTJ',
+          like: 135639,
+          people: 120376,
+          think: 115525,
+          get: 110972,
+          make: 85592,
+          thing: 85016,
+          go: 78184,
+          one: 78049,
+          know: 76723,
+          time: 76397,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          feel: 0,
+          er: 0,
+          say: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'INTP',
+          like: 157408,
+          think: 141470,
+          people: 125874,
+          get: 121700,
+          thing: 95793,
+          make: 94111,
+          one: 86266,
+          know: 82822,
+          would: 82305,
+          say: 81820,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          feel: 0,
+          go: 0,
+          er: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ISFJ',
+          like: 4830,
+          think: 4166,
+          people: 3466,
+          get: 3318,
+          thing: 2858,
+          feel: 2651,
+          make: 2581,
+          say: 2489,
+          know: 2431,
+          really: 2394,
+          good: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          go: 0,
+          one: 0,
+          er: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ISFP',
+          like: 7424,
+          think: 6080,
+          get: 4311,
+          people: 4264,
+          thing: 3609,
+          know: 3448,
+          feel: 3376,
+          really: 3305,
+          say: 3250,
+          make: 3181,
+          good: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          go: 0,
+          one: 0,
+          er: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ISTJ',
+          like: 8614,
+          get: 6606,
+          think: 6484,
+          people: 5670,
+          go: 5117,
+          thing: 4807,
+          time: 4797,
+          make: 4626,
+          know: 4611,
+          would: 4531,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          feel: 0,
+          one: 0,
+          er: 0,
+          say: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ISTP',
+          like: 22469,
+          get: 18510,
+          people: 17846,
+          think: 17448,
+          thing: 12584,
+          go: 12453,
+          make: 12200,
+          say: 12105,
+          know: 11502,
+          would: 11379,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          feel: 0,
+          one: 0,
+          er: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ENFJ',
+          like: 10573,
+          think: 9263,
+          people: 8966,
+          feel: 7461,
+          get: 7221,
+          make: 6324,
+          know: 6302,
+          thing: 5901,
+          say: 5455,
+          really: 5440,
+          good: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          go: 0,
+          one: 0,
+          er: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ENFP',
+          like: 44550,
+          get: 35113,
+          think: 34808,
+          people: 32680,
+          feel: 29092,
+          thing: 25557,
+          make: 25483,
+          know: 24557,
+          go: 23377,
+          time: 22491,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          one: 0,
+          er: 0,
+          say: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ENTJ',
+          like: 17221,
+          get: 14923,
+          people: 14603,
+          think: 14526,
+          make: 10787,
+          one: 10280,
+          would: 9738,
+          good: 9708,
+          know: 9628,
+          thing: 9350,
+          really: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          feel: 0,
+          go: 0,
+          er: 0,
+          say: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ENTP',
+          like: 77544,
+          think: 69750,
+          people: 61030,
+          get: 60010,
+          make: 46477,
+          thing: 44068,
+          one: 41359,
+          know: 40932,
+          say: 40871,
+          go: 39112,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          feel: 0,
+          er: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ESFJ',
+          like: 1497,
+          think: 1352,
+          people: 1048,
+          get: 914,
+          type: 890,
+          know: 848,
+          make: 719,
+          esfj: 719,
+          say: 710,
+          feel: 693,
+          good: 0,
+          really: 0,
+          det: 0,
+          time: 0,
+          go: 0,
+          one: 0,
+          er: 0,
+          would: 0,
+          thing: 0,
+        },
+        {
+          name: 'ESFP',
+          like: 3230,
+          think: 2241,
+          people: 1931,
+          get: 1781,
+          know: 1464,
+          type: 1457,
+          say: 1438,
+          make: 1373,
+          one: 1344,
+          thing: 1327,
+          good: 0,
+          really: 0,
+          det: 0,
+          time: 0,
+          feel: 0,
+          go: 0,
+          er: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ESTJ',
+          think: 2894,
+          like: 2670,
+          people: 2089,
+          get: 1893,
+          type: 1861,
+          det: 1752,
+          er: 1745,
+          would: 1528,
+          make: 1509,
+          say: 1487,
+          good: 0,
+          really: 0,
+          time: 0,
+          know: 0,
+          feel: 0,
+          go: 0,
+          one: 0,
+          thing: 0,
+          esfj: 0,
+        },
+        {
+          name: 'ESTP',
+          like: 10652,
+          get: 8959,
+          people: 8407,
+          think: 8297,
+          would: 7023,
+          one: 6164,
+          make: 5850,
+          know: 5635,
+          say: 5611,
+          go: 5524,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          feel: 0,
+          er: 0,
+          thing: 0,
+          esfj: 0,
+        },
+        {
+          name: 'INFJ',
+          like: 103099,
+          think: 89207,
+          people: 83556,
+          get: 76173,
+          feel: 72804,
+          thing: 60756,
+          know: 60459,
+          make: 58497,
+          go: 54304,
+          time: 54177,
+          good: 0,
+          really: 0,
+          det: 0,
+          type: 0,
+          one: 0,
+          er: 0,
+          say: 0,
+          would: 0,
+          esfj: 0,
+        },
+        {
+          name: 'INFP',
+          like: 90730,
+          think: 72434,
+          people: 62124,
+          get: 60677,
+          feel: 59916,
+          thing: 48427,
+          know: 46845,
+          make: 46627,
+          really: 45153,
+          one: 44193,
+          good: 0,
+          det: 0,
+          type: 0,
+          time: 0,
+          go: 0,
+          er: 0,
+          say: 0,
+          would: 0,
+          esfj: 0,
+        },
+      ];
+
+      const keys = [
+        'det',
+        'er',
+        'esfj',
+        'feel',
+        'get',
+        'go',
+        'good',
+        'know',
+        'like',
+        'make',
+        'one',
+        'people',
+        'really',
+        'say',
+        'thing',
+        'think',
+        'time',
+        'type',
+        'would',
+      ];
+
+      // Define categories based on the keys of the first data object
+      const categories = Object.keys(data[0]).filter((k) => k !== 'name');
+
+      // Calculate sums for each 'name'
+      let sums = {};
+      data.forEach((d) => {
+        sums[d.name] = categories.reduce(
+          (acc, category) => acc + (d[category] || 0),
+          0
+        );
+      });
+
+      // Sort data based on the sums
+      data.sort((a, b) => d3.descending(sums[a.name], sums[b.name]));
+
+      // After this, continue creating arcData and the rest of the D3 code as before:
+      const arcData = data.flatMap((d) =>
+        Array.from(categories, (category) => ({
+          name: d.name,
+          category,
+          value: d[category] || 0,
+        }))
+      );
+
+      //const categories = new Set(
+      //  data.flatMap((d) => Object.keys(d)).filter((d) => d !== 'name')
+      // );
+
+      //const arcData = data.flatMap((d) =>
+      //  Array.from(categories, (category) => ({
+      //    name: d.name,
+      //    category,
+      //    value: d[category] || 0,
+      //  }))
+      //);
+
+      const width = 600;
+      const height = 800;
+      const innerRadius = 60;
+      const outerRadius = Math.min(width, height) / 2 - 160;
+
+      // Create SVG
+      const svg = d3
+        .select('body')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+      // Create scales
+      const x = d3
+        .scaleBand()
+        .domain(data.map((d) => d.name))
+        .range([0, 2 * Math.PI])
+        .align(0);
+
+      // This scale maintains area proportionality of radial bars
+      const y = d3
+        .scaleRadial()
+        .domain([0, d3.max(arcData, (d) => d.value)])
+        .nice()
+        .range([innerRadius, outerRadius]);
+
+      // Define color scale
+      const color = d3
+        .scaleOrdinal()
+        .domain(data.map((d) => d.name))
+        .range(
+          d3
+            .quantize((t) => d3.interpolateSpectral(t * 0.8 + 0.1), data.length)
+            .reverse()
+        );
+
+      const stack = d3.stack().keys(keys);
+
+      const series = stack(data).map((category, i) =>
+        category.map((value) => ({
+          ...value,
+          key: keys[i], // now value includes key as well as data
+        }))
+      );
+
+      svg
+        .append('g')
+        .selectAll('g')
+        .data(series)
+        .join('g')
+        .attr('fill', (d, i) => color(i))
+        .selectAll('path')
+        .data((d) => d)
+        .join('path')
+        .attr(
+          'd',
+          d3
+            .arc()
+            .innerRadius((d) => y(d[0]))
+            .outerRadius((d) => y(d[1]))
+            .startAngle((d) => x(d.data.name))
+            .endAngle((d) => x(d.data.name) + x.bandwidth())
+            .padAngle(0.01)
+            .padRadius(innerRadius)
+        )
+        .append('title');
+
+      // Add tooltip
+      const tooltip = d3
+        .select('body')
+        .append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0);
+
+      svg
+        .selectAll('path')
+        .on('mouseover', (event, d, i) => {
+          tooltip.transition().duration(200).style('opacity', 0.9);
+          tooltip
+            .html(
+              `${d.data.name} <br> Word: ${d.key} <br> Count: ${d[1] - d[0]}`
+            )
+            .style('left', event.pageX + 'px')
+            .style('top', event.pageY - 28 + 'px');
+        })
+        .on('mouseout', (event, d) => {
+          tooltip.transition().duration(500).style('opacity', 0);
+        });
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Survey</title>
+  <style>
+    body {
+      background-color: #4b2e83;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .survey-frame {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: #fff;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .survey-container {
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .message {
+      margin-top: 1rem;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .button-container button {
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .redo-button {
+      padding: 0.5rem 1rem;
+    }
+
+    .answer-input {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+    }
+
+    .chart-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    canvas {
+      max-width: 300px;
+    }
+
+    #wordcloud-container {
+      width: 800px;
+      height: 600px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="survey-frame">
+    <div class="survey-container">
+      <h1>Survey</h1>
+
+      <div id="question2">
+        <h3>Choose your favorite words in the Intuitives and Sensors category.</h3>
+        <div id="wordcloud-container"></div>
+        <br>
+        <div class="button-container">
+          <button type="button" onclick="previousPage()">Previous</button>
+          <button type="button" onclick="nextPage()">Next</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+  <script>
+    function previousPage() {
+      // Redirect to question2.html
+      window.location.href = 'question2.html';
+    }
+
+    function nextPage() {
+    // Get the selected words from the word cloud
+    const N_S_selectedWords = getSelectedWords();
+
+    // Check if any words are selected
+      if (N_S_selectedWords.length > 0) {
+      // Save the selected words in local storage
+      localStorage.setItem('N_S_selectedWords', JSON.stringify(N_S_selectedWords));
+
+      // Redirect to question4.html
+      window.location.href = 'question4.html';
+      } else {
+      alert('Please select at least one word.');
+      }
+    }
+
+
+    function getSelectedWords() {
+      const wordElements = document.getElementsByClassName('word');
+      const N_S_selectedWords = [];
+      for (let i = 0; i < wordElements.length; i++) {
+        if (wordElements[i].classList.contains('selected')) {
+          N_S_selectedWords.push(wordElements[i].textContent);
+        }
+      }
+      return N_S_selectedWords;
+    }
+
+    // Load the words from I-E.csv and generate the word cloud
+    d3.csv("N_S.csv")
+      .then(function(data) {
+        const words = data.map(function(d) {
+          return { text: d.word, size: +d.size };
+        });
+
+        const layout = d3.layout.cloud()
+          .size([800, 600])
+          .words(words)
+          .padding(5)
+          .rotate(function() { return ~~(Math.random() * 2) * 90; })
+          .fontSize(function(d) { return d.size; })
+          .on("end", function() {
+            draw(words);
+            addClickHandlers();
+          });
+
+        layout.start();
+
+        function draw(words) {
+          d3.select("#wordcloud-container")
+            .append("svg")
+            .attr("width", layout.size()[0])
+            .attr("height", layout.size()[1])
+            .append("g")
+            .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+            .selectAll("text")
+            .data(words)
+            .enter()
+            .append("text")
+            .style("font-size", function(d) { return d.size + "px"; })
+            .style("fill", "steelblue")
+            .attr("class", "word")
+            .attr("text-anchor", "middle")
+            .attr("transform", function(d) { return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+            .text(function(d) { return d.text; });
+        }
+
+        function addClickHandlers() {
+          const words = document.querySelectorAll(".word");
+          words.forEach(function(word) {
+            word.addEventListener("click", function() {
+              if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                this.style.fill = "steelblue";
+              } else {
+                this.classList.add('selected');
+                this.style.fill = "purple";
+              }
+            });
+          });
+        }
+      });
+  </script>
+</body>
+</html>

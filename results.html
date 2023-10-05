@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Survey Results</title>
+  <style>
+    body {
+      background-color: #4b2e83;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .survey-frame {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: #fff;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .survey-container {
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .message {
+      margin-top: 1rem;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .button-container button {
+      margin: 0 0.5rem;
+      padding: 0.5rem 1rem;
+    }
+
+    .redo-button {
+      padding: 0.5rem 1rem;
+    }
+
+    .answer-input {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+    }
+
+    .chart-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    canvas {
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div class="survey-frame">
+    <div class="survey-container">
+      <h1>Survey Results</h1>
+        <div id="matching-words-container"></div>
+        <div id="chart1Container" style="height: 100px; width: 100%"></div>
+        <div id="chart2Container" style="height: 100px; width: 100%"></div>
+        <div id="chart3Container" style="height: 100px; width: 100%"></div>
+        <div id="chart4Container" style="height: 100px; width: 100%"></div>
+        <br> <!-- Add a line break here -->
+        <div class="image-container">
+          <div id="image-container"></div>
+        <div id="results">
+        <div id="nameResult"></div>
+        <div class="button-container">
+          <button type="button" onclick="redoSurvey()" class="redo-button">Redo Survey</button>
+          <button type="button" onclick="goToDistribution()" class="distribution-button">Distribution</button>
+          <button type="button" onclick="goToBarchart()" class="barchart-button">Radial Bar Chart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+  <script>
+    // Retrieve the selected words from local storage
+    // Retrieve the selected words from local storage
+    const I_E_selectedWords = JSON.parse(localStorage.getItem('I_E_selectedWords')) || [];
+    const N_S_selectedWords = JSON.parse(localStorage.getItem('N_S_selectedWords')) || [];
+    const F_T_selectedWords = JSON.parse(localStorage.getItem('F_T_selectedWords')) || [];
+    const P_J_selectedWords = JSON.parse(localStorage.getItem('P_J_selectedWords')) || [];
+
+    // Combine the selected words from both storages into a single list
+    const selectedWords = [...I_E_selectedWords, ...N_S_selectedWords, ...F_T_selectedWords, ...P_J_selectedWords];
+    console.log('Selected Words:', selectedWords);
+
+
+    // Compare the selected words with the given list
+    const I_E_csvFiles = ['I.csv', 'E.csv'];
+
+    let I_Percentage = 0;
+    let E_Percentage = 0;
+    let I_MatchingWords = [];
+    let E_MatchingWords = [];
+    let I_MBTI = '';
+    let E_MBTI = '';
+
+    I_E_csvFiles.forEach(I_E_csvFile => {
+      fetch(I_E_csvFile)
+        .then(response => response.text())
+        .then(csvData => {
+          const givenList = csvData.split('\n').map(word => word.trim());
+
+          // Compare the selected words with the given list
+          const matchingWords = I_E_selectedWords.filter(word => givenList.includes(word));
+
+          // Calculate the percentage of matching words
+         const percentage = (matchingWords.length / I_E_selectedWords.length) * 100;
+          console.log(percentage);
+
+          // Update the matching words and percentages accordingly
+          if (I_E_csvFile === 'I.csv') {
+            I_Percentage = percentage;
+            I_MatchingWords = matchingWords;
+            I_MBTI = I_E_csvFile.replace('.csv', '');
+          } else if (I_E_csvFile === 'E.csv') {
+            E_Percentage = percentage;
+            E_MatchingWords = matchingWords;
+            E_MBTI = I_E_csvFile.replace('.csv', '');
+          }
+        });
+    });
+
+
+
+    // Compare the selected words with the given list
+    const N_S_csvFiles = ['N.csv', 'S.csv'];
+
+    let N_Percentage = 0;
+    let S_Percentage = 0;
+    let N_MatchingWords = [];
+    let S_MatchingWords = [];
+    let N_MBTI = '';
+    let S_MBTI = '';
+
+    N_S_csvFiles.forEach(N_S_csvFile => {
+      fetch(N_S_csvFile)
+        .then(response => response.text())
+        .then(csvData => {
+          const givenList = csvData.split('\n').map(word => word.trim());
+
+          // Compare the selected words with the given list
+          const matchingWords = N_S_selectedWords.filter(word => givenList.includes(word));
+
+          // Calculate the percentage of matching words
+          const percentage = (matchingWords.length / N_S_selectedWords.length) * 100;
+          console.log(percentage);
+
+          // Update the matching words and percentages accordingly
+          if (N_S_csvFile === 'N.csv') {
+            N_Percentage = percentage;
+            N_MatchingWords = matchingWords;
+            N_MBTI = N_S_csvFile.replace('.csv', '');
+         } else if (N_S_csvFile === 'S.csv') {
+            S_Percentage = percentage;
+            S_MatchingWords = matchingWords;
+            S_MBTI = N_S_csvFile.replace('.csv', '');
+          }
+
+       });
+    });
+
+
+
+    // Compare the selected words with the given list
+    const F_T_csvFiles = ['F.csv', 'T.csv'];
+
+    let F_Percentage = 0;
+    let T_Percentage = 0;
+    let F_MatchingWords = [];
+    let T_MatchingWords = [];
+    let F_MBTI = '';
+    let T_MBTI = '';
+
+    F_T_csvFiles.forEach(F_T_csvFile => {
+      fetch(F_T_csvFile)
+        .then(response => response.text())
+        .then(csvData => {
+          const givenList = csvData.split('\n').map(word => word.trim());
+
+          // Compare the selected words with the given list
+          const matchingWords = F_T_selectedWords.filter(word => givenList.includes(word));
+
+          // Calculate the percentage of matching words
+          const percentage = (matchingWords.length / F_T_selectedWords.length) * 100;
+          console.log(percentage);
+
+          // Update the matching words and percentages accordingly
+          if (F_T_csvFile === 'F.csv') {
+            F_Percentage = percentage;
+            F_MatchingWords = matchingWords;
+            F_MBTI = F_T_csvFile.replace('.csv', '');
+          } else if (F_T_csvFile === 'T.csv') {
+            T_Percentage = percentage;
+            T_MatchingWords = matchingWords;
+            T_MBTI = F_T_csvFile.replace('.csv', '');
+          }
+        });
+    });
+
+    
+    // Compare the selected words with the given list
+    const P_J_csvFiles = ['P.csv', 'J.csv'];
+
+    let P_Percentage = 0;
+    let J_Percentage = 0;
+    let P_MatchingWords = [];
+    let J_MatchingWords = [];
+    let P_MBTI = '';
+    let J_MBTI = '';
+
+    P_J_csvFiles.forEach(P_J_csvFile => {
+      fetch(P_J_csvFile)
+        .then(response => response.text())
+        .then(csvData => {
+          const givenList = csvData.split('\n').map(word => word.trim());
+
+          // Compare the selected words with the given list
+          const matchingWords = P_J_selectedWords.filter(word => givenList.includes(word));
+
+          // Calculate the percentage of matching words
+          const percentage = (matchingWords.length / P_J_selectedWords.length) * 100;
+          console.log(percentage);
+
+          // Update the matching words and percentages accordingly
+          if (P_J_csvFile === 'P.csv') {
+            P_Percentage = percentage;
+            P_MatchingWords = matchingWords;
+            P_MBTI = P_J_csvFile.replace('.csv', '');
+          } else if (P_J_csvFile === 'J.csv') {
+            J_Percentage = percentage;
+            J_MatchingWords = matchingWords;
+            J_MBTI = P_J_csvFile.replace('.csv', '');
+          }
+        });
+    });
+
+
+// Setup a global variable my_MBTI
+let my_MBTI_1 = '';
+let my_MBTI_2 = '';
+let my_MBTI_3 = '';
+let my_MBTI_4 = '';
+
+Promise.all([
+Promise.all(I_E_csvFiles.map(I_E_csvFile => fetch(I_E_csvFile)))
+      .then(responses => Promise.all(responses.map(response => response.text())))
+      .then(csvData => {
+        console.log('I Percentage:', I_Percentage);
+        console.log('I Matching Words:', I_MatchingWords);
+        console.log('I MBTI:', I_MBTI);
+        console.log('E Percentage:', E_Percentage);
+        console.log('E Matching Words:', E_MatchingWords);
+        console.log('E MBTI:', E_MBTI);
+
+        // Find the maximum values
+        const maxIE = Math.max(I_Percentage, E_Percentage);
+        console.log('Max I/E Percentage:', maxIE);
+        if (maxIE === I_Percentage) {
+          my_MBTI_1 += 'I';
+        } else {
+          my_MBTI_1 += 'E';
+        }
+
+        console.log('My MBTI 1:', my_MBTI_1);
+
+
+    // Render the chart
+    var chartIE = new CanvasJS.Chart('chart1Container', {
+      animationEnabled: true,
+      theme: 'light2', //"light1", "dark1", "dark2"
+      title: {
+        text: 'Introversion(I) vs Extraversion(E)',
+      },
+      axisY: {
+        interval: 10,
+        suffix: '%',
+      },
+      toolTip: {
+        shared: true,
+      },
+      data: [
+        {
+          type: 'stackedBar100',
+          toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+          showInLegend: false,
+          name: 'Introversion',
+          dataPoints: [{ y: I_Percentage, label: 'I-E' }],
+        },
+        {
+          type: 'stackedBar100',
+          toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+          showInLegend: false,
+          name: 'Extraversion',
+          dataPoints: [{ y: E_Percentage, label: 'I-E' }],
+        },
+      ],
+    });
+
+    chartIE.render();
+  }),
+
+  Promise.all(N_S_csvFiles.map(N_S_csvFile => fetch(N_S_csvFile)))
+    .then(responses => Promise.all(responses.map(response => response.text())))
+    .then(csvData => {
+      console.log('N Percentage:', N_Percentage);
+      console.log('N Matching Words:', N_MatchingWords);
+      console.log('N MBTI:', N_MBTI);
+      console.log('S Percentage:', S_Percentage);
+      console.log('S Matching Words:', S_MatchingWords);
+      console.log('S MBTI:', S_MBTI);
+
+      // Find the maximum value
+      const maxNS = Math.max(N_Percentage, S_Percentage);
+
+      if (maxNS === N_Percentage) {
+        my_MBTI_2 += 'N';
+      } else {
+        my_MBTI_2 += 'S';
+      }
+
+      // Append the MBTI string to my_MBTI
+      my_MBTI_2 += '';
+
+      console.log('My MBTI 2:', my_MBTI_2);
+
+      // Render the chart
+      var chartNS = new CanvasJS.Chart('chart2Container', {
+        animationEnabled: true,
+        theme: 'light2',
+        title: {
+          text: 'Intuition(N) vs Sensing(S)',
+        },
+        axisY: {
+          interval: 10,
+          suffix: '%',
+        },
+        toolTip: {
+          shared: true,
+        },
+        data: [
+          {
+            type: 'stackedBar100',
+            toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+            showInLegend: false,
+            name: 'Intuition',
+            dataPoints: [{ y: N_Percentage, label: 'N-S' }],
+          },
+          {
+            type: 'stackedBar100',
+            toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+            showInLegend: false,
+            name: 'Sensing',
+            dataPoints: [{ y: S_Percentage, label: 'N-S' }],
+          },
+        ],
+      });
+
+      chartNS.render();
+    }),
+    Promise.all(F_T_csvFiles.map(F_T_csvFile => fetch(F_T_csvFile)))
+      .then(responses => Promise.all(responses.map(response => response.text())))
+      .then(csvData => {
+        console.log('F Percentage:', F_Percentage);
+        console.log('F Matching Words:', F_MatchingWords);
+        console.log('F MBTI:', F_MBTI);
+        console.log('T Percentage:', T_Percentage);
+        console.log('T Matching Words:', T_MatchingWords);
+        console.log('T MBTI:', T_MBTI);
+
+        // Find the maximum value
+        const maxFT = Math.max(F_Percentage, T_Percentage);
+
+        if (maxFT === F_Percentage) {
+          my_MBTI_3 += 'F';
+        } else {
+          my_MBTI_3 += 'T';
+        }
+
+        // Append the MBTI string to my_MBTI
+        my_MBTI_3 += '';
+
+        console.log('My MBTI 3:', my_MBTI_3);
+
+    // Render the chart
+    var chartFT = new CanvasJS.Chart('chart3Container', {
+      animationEnabled: true,
+      theme: 'light2',
+      title: {
+        text: 'Feeling(F) vs Thinking(T)',
+      },
+      axisY: {
+        interval: 10,
+        suffix: '%',
+      },
+      toolTip: {
+        shared: true,
+      },
+      data: [
+        {
+          type: 'stackedBar100',
+          toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+          showInLegend: false,
+          name: 'Feeling',
+          dataPoints: [{ y: F_Percentage, label: 'F-T' }],
+        },
+        {
+          type: 'stackedBar100',
+          toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+          showInLegend: false,
+          name: 'Thinking',
+          dataPoints: [{ y: T_Percentage, label: 'F-T' }],
+        },
+      ],
+    });
+
+    chartFT.render();
+  }),
+  Promise.all(P_J_csvFiles.map(P_J_csvFile => fetch(P_J_csvFile)))
+      .then(responses => Promise.all(responses.map(response => response.text())))
+      .then(csvData => {
+        console.log('P Percentage:', P_Percentage);
+        console.log('P Matching Words:', P_MatchingWords);
+        console.log('P MBTI:', P_MBTI);
+        console.log('J Percentage:', J_Percentage);
+        console.log('J Matching Words:', J_MatchingWords);
+        console.log('J MBTI:', J_MBTI);
+
+        // Find the maximum value
+        const maxPJ = Math.max(P_Percentage, J_Percentage);
+
+        if (maxPJ === P_Percentage) {
+          my_MBTI_4 += 'P';
+        } else {
+          my_MBTI_4 += 'J';
+        }
+
+        console.log('My MBTI 4:', my_MBTI_4);
+
+    // Render the chart
+    var chartPJ = new CanvasJS.Chart('chart4Container', {
+      animationEnabled: true,
+      theme: 'light2',
+      title: {
+        text: 'Perceiving(P) vs Judging(J)',
+      },
+      axisY: {
+        interval: 10,
+        suffix: '%',
+      },
+      toolTip: {
+        shared: true,
+      },
+      data: [
+        {
+          type: 'stackedBar100',
+          toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+          showInLegend: false,
+          name: 'Perceiving',
+          dataPoints: [{ y: P_Percentage, label: 'P-J' }],
+        },
+        {
+          type: 'stackedBar100',
+          toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+          showInLegend: false,
+          name: 'Judging',
+          dataPoints: [{ y: J_Percentage, label: 'P-J' }],
+        },
+      ],
+    });
+
+    chartPJ.render();
+  }),
+])
+  .then(() => {
+    const my_MBTI = my_MBTI_1 + my_MBTI_2 + my_MBTI_3 + my_MBTI_4;
+    console.log('My MBTI:', my_MBTI);
+
+    const imageContainer = document.getElementById('image-container');
+    const imageFilename = `wordcloud/${my_MBTI}_1.png`;
+
+      // Create the image element
+      const imageElement = document.createElement('img');
+      imageElement.src = imageFilename;
+      imageElement.alt = my_MBTI;
+      imageElement.width = 500; // Set the desired width in pixels
+      imageElement.height = 200; // Set the desired height in pixels
+      // Append the image to the container
+      imageContainer.appendChild(imageElement);
+
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+
+
+    // Retrieve the name from index.html
+    const name = localStorage.getItem('name');
+
+
+    // Display the retrieved data in the result containers
+    const nameResult = document.getElementById('nameResult');
+    nameResult.innerHTML = `Name: ${name}`;
+
+
+    // Clear the stored data after displaying it
+    localStorage.removeItem('name');
+    localStorage.removeItem('favoriteWords');
+
+    function redoSurvey() {
+      // Redirect to index.html
+      window.location.href = 'index.html';
+    }
+
+    // Redirect to the distribution page
+    function goToDistribution() {
+      window.location.href = 'distribution.html';
+    }
+
+    // Redirect to the barchart page
+    function goToBarchart() {
+      window.location.href = 'barchart.html';
+    }
+
+  </script>
+</body>
+</html>

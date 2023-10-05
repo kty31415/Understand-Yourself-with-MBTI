@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      window.onload = function () {
+        var chartIE = new CanvasJS.Chart('chart1Container', {
+          animationEnabled: true,
+          theme: 'light2', //"light1", "dark1", "dark2"
+          title: {
+            text: 'Introversion(I) vs Extraversion(E)',
+          },
+          axisY: {
+            interval: 10,
+            suffix: '%',
+          },
+          toolTip: {
+            shared: true,
+          },
+          data: [
+            {
+              type: 'stackedBar100',
+              toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Introvertion',
+              dataPoints: [{ y: 0.63, label: 'I-E' }],
+            },
+            {
+              type: 'stackedBar100',
+              toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Extraversion',
+              dataPoints: [{ y: 0.37, label: 'I-E' }],
+            },
+          ],
+        });
+
+        var chartSN = new CanvasJS.Chart('chart2Container', {
+          animationEnabled: true,
+          theme: 'light2', //"light1", "dark1", "dark2"
+          title: {
+            text: 'Sensing(S) vs Intuition(N)',
+          },
+          axisY: {
+            interval: 10,
+            suffix: '%',
+          },
+          toolTip: {
+            shared: true,
+          },
+          data: [
+            {
+              type: 'stackedBar100',
+              toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Sensing',
+              dataPoints: [{ y: 0.51, label: 'S-N' }],
+            },
+            {
+              type: 'stackedBar100',
+              toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Intuition',
+              dataPoints: [{ y: 0.49, label: 'S-N' }],
+            },
+          ],
+        });
+
+        var chartTF = new CanvasJS.Chart('chart3Container', {
+          animationEnabled: true,
+          theme: 'light2', //"light1", "dark1", "dark2"
+          title: {
+            text: 'Thinking(T) vs Feeling(F)',
+          },
+          axisY: {
+            interval: 10,
+            suffix: '%',
+          },
+          toolTip: {
+            shared: true,
+          },
+          data: [
+            {
+              type: 'stackedBar100',
+              toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Thinking',
+              dataPoints: [{ y: 0.6, label: 'T-F' }],
+            },
+            {
+              type: 'stackedBar100',
+              toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Feeling',
+              dataPoints: [{ y: 0.4, label: 'T-F' }],
+            },
+          ],
+        });
+
+        var chartJP = new CanvasJS.Chart('chart4Container', {
+          animationEnabled: true,
+          theme: 'light2', //"light1", "dark1", "dark2"
+          title: {
+            text: 'Judging(T) vs Perceiving(P)',
+          },
+          axisY: {
+            interval: 10,
+            suffix: '%',
+          },
+          toolTip: {
+            shared: true,
+          },
+          data: [
+            {
+              type: 'stackedBar100',
+              toolTipContent: '{label}<br><b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Judging',
+              dataPoints: [{ y: 0.4, label: 'J-P' }],
+            },
+            {
+              type: 'stackedBar100',
+              toolTipContent: '<b>{name}:</b> {y} (#percent%)',
+              showInLegend: false,
+              name: 'Perceiving',
+              dataPoints: [{ y: 0.6, label: 'J-P' }],
+            },
+          ],
+        });
+
+        chartIE.render();
+        chartSN.render();
+        chartTF.render();
+        chartJP.render();
+      };
+    </script>
+  </head>
+  <body>
+    <div id="chart1Container" style="height: 100px; width: 100%"></div>
+    <div id="chart2Container" style="height: 100px; width: 100%"></div>
+    <div id="chart3Container" style="height: 100px; width: 100%"></div>
+    <div id="chart4Container" style="height: 100px; width: 100%"></div>
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+  </body>
+</html>
